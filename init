@@ -1,6 +1,5 @@
 #!/usr/bin/busybox sh
 
-/usr/bin/busybox uptime
 /usr/bin/busybox mount -t devtmpfs devtmpfs /dev
 /usr/bin/busybox mount -t proc none /proc
 /usr/bin/busybox mount -t sysfs none /sys

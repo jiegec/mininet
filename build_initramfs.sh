@@ -70,6 +70,7 @@ copy_binary dhclient
 copy_binary dhclient-script
 copy_binary chown
 copy_binary chmod
+copy_binary dmesg
 cp `which dhclient-script` $CHROOT/sbin
 cp `which ip` $CHROOT/sbin
 make -C $LINUX modules_install INSTALL_MOD_PATH=$CHROOT -j50
