@@ -75,3 +75,4 @@ cp `which ip` $CHROOT/sbin
 make -C $LINUX modules_install INSTALL_MOD_PATH=$CHROOT -j50
 cd $CHROOT
 find . | cpio --quiet -R 0:0 -o -H newc | gzip > ../initrd.img
+wc -c <../initrd.img > ../initramfs_size
