@@ -1,0 +1,22 @@
+#!/usr/bin/busybox sh
+
+/usr/bin/busybox uptime
+/usr/bin/busybox mount -t devtmpfs devtmpfs /dev
+/usr/bin/busybox mount -t proc none /proc
+/usr/bin/busybox mount -t sysfs none /sys
+# for 9p fs
+/usr/bin/busybox modprobe virtio_pci
+/usr/bin/busybox modprobe 9p
+/usr/bin/busybox modprobe 9pnet_virtio
+/usr/bin/busybox mount -t 9p rootshare /mnt/root -o trans=virtio,version=9p2000.L
+# for tcpdump
+/usr/bin/busybox modprobe af_packet
+/usr/bin/busybox modprobe unix
+
+/usr/bin/busybox modprobe ipv6
+
+/usr/bin/busybox ip l set lo up
+/usr/bin/busybox ip l set eth0 up
+
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/bin
+exec /usr/bin/busybox getty -n 115200 ttyS0 -l /usr/bin/bash vt100
