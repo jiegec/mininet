@@ -2,7 +2,7 @@
 SCRIPT=`realpath $0`
 SCRIPTPATH=`dirname $SCRIPT`
 CHROOT=$SCRIPTPATH/initramfs/
-LINUX=~/linux-4.17.6
+LINUX=~/linux-4.17.10
 
 function copy_binary() {
     cp -f --parents $(which $*) $CHROOT
@@ -71,6 +71,7 @@ copy_binary dhclient-script
 copy_binary chown
 copy_binary chmod
 copy_binary dmesg
+copy_binary uname
 cp `which dhclient-script` $CHROOT/sbin
 cp `which ip` $CHROOT/sbin
 make -C $LINUX modules_install INSTALL_MOD_PATH=$CHROOT -j50

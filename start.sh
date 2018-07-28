@@ -1,5 +1,5 @@
 #!/bin/bash
-LINUX=~/linux-4.17.6
+LINUX=~/linux-4.17.10
 
 MACSTR=("`printf 'DE:AD:BE:EF:%02X:%02X\n' $((RANDOM%256)) $((RANDOM%256))`")
 qemu-system-x86_64 -kernel $LINUX/arch/x86/boot/bzImage -initrd initrd.img -nographic -append 'console=ttyS1' \
