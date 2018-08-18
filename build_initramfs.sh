@@ -1,9 +1,9 @@
 #!/bin/sh
+source ./common.sh
 SCRIPT=`realpath $0`
 SCRIPTPATH=`dirname $SCRIPT`
 ROOTFS=$SCRIPTPATH/rootfs/
 INITRAMFS=$SCRIPTPATH/initramfs/
-LINUX=~/linux-4.18.2
 
 function copy_binary() {
     cp -f --parents $(which $*) $ROOTFS

@@ -6,6 +6,9 @@
 /usr/bin/busybox modprobe af_packet
 /usr/bin/busybox modprobe unix
 
+# for eth0 interface
+/usr/bin/busybox modprobe e1000
+
 /usr/bin/busybox modprobe ipv6
 
 /usr/bin/busybox ip l set lo up
