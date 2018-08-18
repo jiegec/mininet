@@ -1,3 +1,4 @@
+rootfs/
 initramfs/
 vde.sock/
 initrd.img

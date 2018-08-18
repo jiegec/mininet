@@ -1,35 +1,38 @@
 #!/bin/sh
 SCRIPT=`realpath $0`
 SCRIPTPATH=`dirname $SCRIPT`
-CHROOT=$SCRIPTPATH/initramfs/
-LINUX=~/linux-4.17.10
+ROOTFS=$SCRIPTPATH/rootfs/
+INITRAMFS=$SCRIPTPATH/initramfs/
+LINUX=~/linux-4.18.2
 
 function copy_binary() {
-    cp -f --parents $(which $*) $CHROOT
+    cp -f --parents $(which $*) $ROOTFS
     for i in $(ldd $(which $*)|grep -v dynamic|cut -d " " -f 3|sed 's/://'|sort|uniq)
       do
-        cp --parents -L -f $i $CHROOT
+        cp --parents -L -f $i $ROOTFS
       done
 
     # ARCH amd64
     if [ -f /lib64/ld-linux-x86-64.so.2 ]; then
-       cp --parents /lib64/ld-linux-x86-64.so.2 $CHROOT
+       cp --parents /lib64/ld-linux-x86-64.so.2 $ROOTFS
     fi
 
     # ARCH i386
     if [ -f  /lib/ld-linux.so.2 ]; then
-       cp --parents /lib/ld-linux.so.2 $CHROOT
+       cp --parents /lib/ld-linux.so.2 $ROOTFS
     fi
 }
 
-rm -rf $CHROOT 
-mkdir -p $CHROOT/{bin,dev,etc,lib,proc,sbin,sys,lib/modules,mnt,mnt/root,run,usr,usr/lib,usr/bin,usr/sbin,usr/share/hwdata,var/lib/dhclient}
-cp init $CHROOT/ 
-cp `which sh` $CHROOT/bin
-cp `which bash` $CHROOT/bin
-cp --parents /usr/share/terminfo/v/vt100 $CHROOT
-cp --parents /usr/share/hwdata/{pci,usb}.ids $CHROOT
+rm -rf $ROOTFS 
+mkdir -p $ROOTFS/{bin,dev,etc,lib,proc,sbin,sys,lib/modules,mnt,mnt/root,run,usr,usr/lib,usr/bin,usr/sbin,usr/share/hwdata,var/lib/dhclient}
+cp early_init $ROOTFS/init
+cp init $ROOTFS/sbin/init
+cp `which sh` $ROOTFS/bin
+cp `which bash` $ROOTFS/bin
+cp --parents /usr/share/terminfo/v/vt100 $ROOTFS
+cp --parents /usr/share/hwdata/{pci,usb}.ids $ROOTFS
 copy_binary busybox 
+copy_binary switch_root 
 copy_binary iptables
 copy_binary iptables-save
 copy_binary brctl
@@ -72,9 +75,19 @@ copy_binary chown
 copy_binary chmod
 copy_binary dmesg
 copy_binary uname
-cp `which dhclient-script` $CHROOT/sbin
-cp `which ip` $CHROOT/sbin
-make -C $LINUX modules_install INSTALL_MOD_PATH=$CHROOT -j50
-cd $CHROOT
-find . | cpio --quiet -R 0:0 -o -H newc | gzip > ../initrd.img
-wc -c <../initrd.img > ../initramfs_size
+cp `which dhclient-script` $ROOTFS/sbin
+cp `which ip` $ROOTFS/sbin
+make -C $LINUX modules_install INSTALL_MOD_PATH=$ROOTFS -j50
+
+rm -rf $INITRAMFS
+mkdir -p $INITRAMFS
+pushd $ROOTFS
+for file in $(cat $SCRIPTPATH/initramfs.txt)
+  do
+    cp --parents -r -f $file $INITRAMFS
+  done
+popd
+
+pushd $INITRAMFS
+find . | cpio --quiet -R 0:0 -o -H newc | gzip > $SCRIPTPATH/initrd.img
+wc -c < $SCRIPTPATH/initrd.img > $SCRIPTPATH/initramfs_size
